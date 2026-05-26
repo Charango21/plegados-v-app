@@ -116,3 +116,74 @@ http://127.0.0.1:8000/admin/
 ## 👨‍💻 Autor
 
 Franco Verdini
+
+## Lo que se piensa hacer
+
+Primero el cliente debe registrarse en la página para poder iniciar seción, lo mismo pasa con los empleados y el jefe del local.
+
+
+El cliente realiza un pedido de chapa en el que ingresa:
+Sus datos personales.
+Las medidas de ancho y largo.
+Espesor
+Forma 
+Pliegues
+Un plano (dibujo)
+
+Lo resibe el empleado y confirma el pedido.
+
+---
+
+## 📊 Modelo de datos
+
+El sistema está diseñado para gestionar pedidos de pliegues de chapa. A continuación se describen los modelos principales:
+
+### Users (Usuarios)
+Todos los usuarios se registran en el sistema y se clasifican según su rol:
+* **Cliente**: Realiza pedidos de chapa
+* **Empleado**: Recibe y confirma los pedidos
+* **Jefe**: Tiene acceso completo al sistema
+
+### SheetMaterial (Material de Chapa)
+Define los tipos de chapa disponibles con sus medidas máximas y espesores.
+
+### Order (Pedido)
+Representa un pedido realizado por un cliente. Contiene:
+* Cliente que realiza el pedido
+* Empleado asignado (opcional hasta confirmación)
+* Estado del pedido (pendiente, confirmado, en producción, finalizado, cancelado)
+
+### OrderItem (Detalle del Pedido)
+Cada item dentro de un pedido contiene:
+* Medidas (ancho y largo en mm)
+* Espesor
+* Forma
+* Descripción de pliegues
+* Plano/dibujo adjunto (imagen)
+
+### Diagrama de relaciones
+
+```
+User (1) ────< Order (N) ────< OrderItem (N) >──── SheetMaterial (1)
+ │
+ ├── role: cliente / empleado / jefe
+ └── phone, address
+
+Order
+ ├── customer → User (cliente)
+ ├── employee → User (empleado/jefe, nullable)
+ └── status: pendiente / confirmado / en_produccion / finalizado / cancelado
+
+OrderItem
+ ├── order → Order
+ ├── sheet_material → SheetMaterial
+ ├── width_mm, length_mm, thickness_mm
+ ├── shape, folds
+ └── blueprint (imagen)
+
+SheetMaterial
+ ├── name, thickness_mm
+ └── max_width_mm, max_length_mm
+```
+
+---
