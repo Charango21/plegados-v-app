@@ -187,3 +187,41 @@ SheetMaterial
 ```
 
 ---
+
+## 🖥️ Frontend (React + Vite)
+
+El frontend se desarrolla en la carpeta `frontend/`, separado del backend pero versionado en el mismo repositorio.
+
+### Estructura de componentes (Home)
+
+```
+App (router)
+├── Navbar
+│   ├── Sin sesión: Login / Register
+│   └── Con sesión: Perfil / Logout
+├── Home (bienvenida de PLEGADOS VERDINI)
+│   ├── Hero (presentación del negocio)
+│   ├── Servicios (pliegues de chapa: medidas, espesor, forma)
+│   └── Cómo pedir (pasos para el cliente)
+├── Rutas protegidas por rol
+│   ├── Cliente: NuevoPedido, MisPedidos
+│   ├── Empleado: GestionarPedidos
+│   └── Jefe: Panel de administración
+└── Footer
+```
+
+### Flujo del pedido
+
+1. El cliente inicia sesión (token JWT).
+2. Completa el formulario de pedido: datos personales, medidas (ancho/largo), espesor, forma, pliegues y plano.
+3. El pedido se envía al backend (`POST api/orders/`).
+4. El empleado ve los pedidos pendientes en `GestionarPedidos` y los confirma.
+5. El jefe gestiona el sistema completo desde su panel.
+
+### Comunicación con el backend
+
+* El frontend corre en `http://localhost:3000` (configurado en `vite.config.js`).
+* El backend corre en `http://127.0.0.1:8000`.
+* CORS permite el origen `http://localhost:3000` para que el frontend pueda consumir la API.
+
+---
