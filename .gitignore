@@ -1,2 +1,4 @@
 venv/
 tp1.md
+__pycache__/
+*.pyc

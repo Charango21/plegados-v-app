@@ -7,6 +7,7 @@ from .models import User, SheetMaterial, Order, OrderItem
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'role', 'phone', 'is_staff')
     list_filter = ('role', 'is_staff', 'is_active')
+    search_fields = ('username', 'email')
     fieldsets = UserAdmin.fieldsets + (
         ('Información adicional', {'fields': ('role', 'phone', 'address')}),
     )
@@ -18,6 +19,7 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(SheetMaterial)
 class SheetMaterialAdmin(admin.ModelAdmin):
     list_display = ('name', 'thickness_mm', 'max_width_mm', 'max_length_mm')
+    search_fields = ('name',)
 
 
 class OrderItemInline(admin.TabularInline):
@@ -29,6 +31,7 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('pk', 'customer', 'employee', 'status', 'created_at')
     list_filter = ('status', 'created_at')
+    search_fields = ('customer__username', 'pk')
     inlines = [OrderItemInline]
 
 
