@@ -218,6 +218,10 @@ App (router)
 4. El empleado ve los pedidos pendientes en `GestionarPedidos` y los confirma.
 5. El jefe gestiona el sistema completo desde su panel.
 
+### Boceto / diseño inicial
+
+[Boceto de la Home](https://drive.google.com/file/d/1mFz-VYPJZNNyWyTf5DscvZ86l1BS0zWC/view?usp=sharing)
+
 ### Comunicación con el backend
 
 * El frontend corre en `http://localhost:3000` (configurado en `vite.config.js`).
