@@ -1,6 +1,7 @@
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { Link } from 'react-router-dom'
+import logo from '../assets/PV.png'
 
 function Home() {
   return (
@@ -8,7 +9,12 @@ function Home() {
       <Navbar />
       <header className="bg-dark text-white text-center py-5">
         <div className="container">
-          <h1 className="display-4 fw-bold">PLEGADOS VERDINI</h1>
+          <img
+            src={logo}
+            alt="PLEGADOS VERDINI"
+            height="240"
+            className="mb-4"
+          />
           <p className="lead mb-4">
             Pliegues de chapa a medida para tu proyecto
           </p>

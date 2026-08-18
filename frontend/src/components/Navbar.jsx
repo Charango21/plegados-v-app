@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
+import logo from '../assets/PV.png'
 
 function Navbar() {
   const { user, logout } = useAuth()
@@ -14,7 +15,12 @@ function Navbar() {
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
         <Link className="navbar-brand" to="/">
-          PLEGADOS VERDINI
+          <img
+            src={logo}
+            alt="PLEGADOS VERDINI"
+            height="40"
+            className="d-inline-block align-top"
+          />
         </Link>
         <button
           className="navbar-toggler"
