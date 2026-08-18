@@ -11,7 +11,7 @@ function Home() {
           <p className="lead mb-4">
             Pliegues de chapa a medida para tu proyecto
           </p>
-          <a href="/register" className="btn btn-light btn-lg">
+          <a href="#register" className="btn btn-light btn-lg">
             Hacer un pedido
           </a>
         </div>
