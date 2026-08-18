@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import { Link } from 'react-router-dom'
 
 function Home() {
   return (
@@ -11,9 +12,9 @@ function Home() {
           <p className="lead mb-4">
             Pliegues de chapa a medida para tu proyecto
           </p>
-          <a href="#register" className="btn btn-light btn-lg">
+          <Link to="/register" className="btn btn-light btn-lg">
             Hacer un pedido
-          </a>
+          </Link>
         </div>
       </header>
       <section className="bg-light py-5 flex-grow-1">
