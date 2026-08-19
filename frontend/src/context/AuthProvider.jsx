@@ -23,10 +23,13 @@ export function AuthProvider({ children }) {
 
   const register = (username, email, password) => {
     if (users.some((u) => u.username === username)) {
-      return false
+      return { ok: false, code: 'user_exists' }
+    }
+    if (users.some((u) => u.email === email)) {
+      return { ok: false, code: 'email_exists' }
     }
     setUsers((prev) => [...prev, { username, email, password }])
-    return true
+    return { ok: true }
   }
 
   const logout = () => setUser(null)

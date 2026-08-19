@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import logo from '../assets/PV.png'
 
@@ -36,9 +36,9 @@ function Navbar() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
-              <Link className="nav-link" to="/">
+              <NavLink className="nav-link" to="/" end>
                 Inicio
-              </Link>
+              </NavLink>
             </li>
             {user ? (
               <>
@@ -60,14 +60,14 @@ function Navbar() {
             ) : (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/login">
+                  <NavLink className="nav-link" to="/login">
                     Ingresar
-                  </Link>
+                  </NavLink>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/register">
+                  <NavLink className="nav-link" to="/register">
                     Registrarse
-                  </Link>
+                  </NavLink>
                 </li>
               </>
             )}
