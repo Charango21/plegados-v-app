@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, SheetMaterial, Order, OrderItem
 from .permissions import (
+    IsAdminOrVendedor,
     IsPublicReadOrStaffWrite,
     IsOrderOwnerOrStaff,
 )
@@ -50,6 +51,7 @@ class LogoutView(APIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAdminOrVendedor]
 
 
 class SheetMaterialViewSet(viewsets.ModelViewSet):
