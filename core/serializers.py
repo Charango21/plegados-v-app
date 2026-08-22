@@ -35,6 +35,14 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = '__all__'
 
+    def validate(self, data):
+        sheet_material = data.get('sheet_material')
+        if sheet_material and sheet_material.stock <= 0:
+            raise serializers.ValidationError(
+                f'No hay stock disponible de {sheet_material.name}.'
+            )
+        return data
+
 
 class OrderItemCreateSerializer(serializers.ModelSerializer):
     class Meta:

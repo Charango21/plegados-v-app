@@ -81,3 +81,10 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        item = serializer.save()
+        sheet_material = item.sheet_material
+        if sheet_material.stock > 0:
+            sheet_material.stock -= 1
+            sheet_material.save(update_fields=['stock'])
