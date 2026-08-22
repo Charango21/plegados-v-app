@@ -13,6 +13,7 @@ class User(AbstractUser):
         choices=Role.choices,
         default=Role.CLIENTE,
     )
+    email = models.EmailField(unique=True, verbose_name='correo electronico')
     phone = models.CharField(max_length=20, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
 

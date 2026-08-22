@@ -9,6 +9,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'password', 'phone', 'address')
 
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('Este email ya está registrado.')
+        return value
+
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = User(**validated_data, role=User.Role.CLIENTE)
