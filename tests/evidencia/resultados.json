@@ -1,0 +1,129 @@
+{
+  "summary": {
+    "total": 15,
+    "passed": 13,
+    "failed": 2
+  },
+  "tests": [
+    {
+      "num": 1,
+      "desc": "GET materiales (publico)",
+      "status": 200,
+      "expected": 200,
+      "passed": true,
+      "extra": ""
+    },
+    {
+      "num": 2,
+      "desc": "POST material JEFE",
+      "status": 201,
+      "expected": 201,
+      "passed": true,
+      "extra": "{\"id\":14,\"name\":\"Chapa Test TP4\",\"thickness_mm\":\"1.50\",\"max_width_mm\":\"1000.00\",\"max_length_mm\":\"2000.00\",\"created_at\":\"2026-08-22T20:13:29.598210Z\",\"updated_at\":\"2026-08-22T20:13:29.598237Z\"}"
+    },
+    {
+      "num": 3,
+      "desc": "POST material CLIENTE",
+      "status": 403,
+      "expected": 403,
+      "passed": true,
+      "extra": ""
+    },
+    {
+      "num": 4,
+      "desc": "POST material ANONIMO",
+      "status": 401,
+      "expected": 401,
+      "passed": true,
+      "extra": ""
+    },
+    {
+      "num": 5,
+      "desc": "PUT material JEFE",
+      "status": 200,
+      "expected": 200,
+      "passed": true,
+      "extra": ""
+    },
+    {
+      "num": 6,
+      "desc": "DELETE material CLIENTE",
+      "status": 403,
+      "expected": 403,
+      "passed": true,
+      "extra": ""
+    },
+    {
+      "num": 7,
+      "desc": "DELETE material JEFE",
+      "status": 204,
+      "expected": 204,
+      "passed": true,
+      "extra": ""
+    },
+    {
+      "num": 8,
+      "desc": "GET users CLIENTE [BUG B1]",
+      "status": 200,
+      "expected": 403,
+      "passed": false,
+      "extra": "Should be 403 but UserViewSet has no permissions"
+    },
+    {
+      "num": 9,
+      "desc": "GET users ANONIMO [BUG B1]",
+      "status": 200,
+      "expected": 401,
+      "passed": false,
+      "extra": ""
+    },
+    {
+      "num": 10,
+      "desc": "Login credenciales invalidas",
+      "status": 401,
+      "expected": 401,
+      "passed": true,
+      "extra": ""
+    },
+    {
+      "num": 11,
+      "desc": "Registro email duplicado [BUG B2]",
+      "status": 400,
+      "expected": 400,
+      "passed": true,
+      "extra": "Should be 400 but email has no unique constraint"
+    },
+    {
+      "num": 12,
+      "desc": "Registro usuario nuevo",
+      "status": 201,
+      "expected": 201,
+      "passed": true,
+      "extra": ""
+    },
+    {
+      "num": 13,
+      "desc": "Crear pedido CLIENTE",
+      "status": 201,
+      "expected": 201,
+      "passed": true,
+      "extra": ""
+    },
+    {
+      "num": 14,
+      "desc": "Crear order-item CLIENTE",
+      "status": 201,
+      "expected": 201,
+      "passed": true,
+      "extra": ""
+    },
+    {
+      "num": 15,
+      "desc": "Verificar pedido con items",
+      "status": 200,
+      "expected": 200,
+      "passed": true,
+      "extra": ""
+    }
+  ]
+}
