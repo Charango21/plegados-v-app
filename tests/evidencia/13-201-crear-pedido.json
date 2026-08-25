@@ -1,0 +1,9 @@
+{
+  "status": 201,
+  "body": {
+    "customer": 6,
+    "employee": null,
+    "status": "pendiente",
+    "notes": "Pedido prueba TP4"
+  }
+}

@@ -1,0 +1,355 @@
+{
+  "info": {
+    "name": "PLEGADOS VERDINI - API Tests",
+    "_postman_id": "plegados-verdini-tests",
+    "description": "Colecci+¦n de pruebas para la API de PLEGADOS VERDINI. Incluye tests por roles, l+¦gica de negocio y flujos completos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000/api" },
+    { "key": "jefe_token", "value": "" },
+    { "key": "empleado_token", "value": "" },
+    { "key": "cliente_token", "value": "" },
+    { "key": "cliente2_token", "value": "" },
+    { "key": "cliente_refresh", "value": "" },
+    { "key": "material_id", "value": "" },
+    { "key": "order_id", "value": "" },
+    { "key": "order_item_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth - Tokens",
+      "item": [
+        {
+          "name": "Login JEFE",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/token/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"username\":\"jefe\",\"password\":\"jefe1234\"}" }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": [
+              "pm.test('Status 200', function() { pm.response.to.have.status(200); });",
+              "pm.test('Token received', function() { var j = pm.response.json(); pm.collectionVariables.set('jefe_token', j.access); pm.expect(j.access).to.exist; });"
+            ]}}
+          ]
+        },
+        {
+          "name": "Login EMPLEADO",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/token/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"username\":\"empleado\",\"password\":\"empleado1234\"}" }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": [
+              "pm.test('Status 200', function() { pm.response.to.have.status(200); });",
+              "pm.test('Token received', function() { var j = pm.response.json(); pm.collectionVariables.set('empleado_token', j.access); });"
+            ]}}
+          ]
+        },
+        {
+          "name": "Login CLIENTE",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/token/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"username\":\"cliente\",\"password\":\"cliente1234\"}" }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": [
+              "pm.test('Status 200', function() { pm.response.to.have.status(200); });",
+              "pm.test('Tokens received', function() { var j = pm.response.json(); pm.collectionVariables.set('cliente_token', j.access); pm.collectionVariables.set('cliente_refresh', j.refresh); });"
+            ]}}
+          ]
+        },
+        {
+          "name": "Login CLIENTE2",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/token/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"username\":\"cliente2\",\"password\":\"cliente1234\"}" }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": [
+              "pm.test('Status 200', function() { pm.response.to.have.status(200); });",
+              "pm.test('Token received', function() { var j = pm.response.json(); pm.collectionVariables.set('cliente2_token', j.access); });"
+            ]}}
+          ]
+        },
+        {
+          "name": "Logout CLIENTE",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/logout/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{cliente_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"refresh\":\"{{cliente_refresh}}\"}" }
+          },
+          "event": [
+            { "listen": "test", "script": { "exec": [
+              "pm.test('Status 205', function() { pm.response.to.have.status(205); });"
+            ]}}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CRUD - Roles (SheetMaterials)",
+      "item": [
+        {
+          "name": "GET materiales (publico)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('200 OK', function() { pm.response.to.have.status(200); });",
+            "pm.test('Es array', function() { pm.expect(pm.response.json()).to.be.an('array'); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/sheet-materials/",
+            "header": []
+          }
+        },
+        {
+          "name": "POST material - JEFE (debe funcionar)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('201 Created', function() { pm.response.to.have.status(201); });",
+            "pm.test('ID returned', function() { var j = pm.response.json(); pm.collectionVariables.set('material_id', j.id); pm.expect(j.id).to.exist; });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/sheet-materials/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jefe_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"name\":\"Chapa de Prueba\",\"thickness_mm\":\"1.00\",\"max_width_mm\":\"1000\",\"max_length_mm\":\"2000\"}" }
+          }
+        },
+        {
+          "name": "POST material - CLIENTE (debe fallar 403)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('403 Forbidden', function() { pm.response.to.have.status(403); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/sheet-materials/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{cliente_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"name\":\"Intento cliente\",\"thickness_mm\":\"1.00\",\"max_width_mm\":\"500\",\"max_length_mm\":\"1000\"}" }
+          }
+        },
+        {
+          "name": "POST material - ANONIMO (debe fallar 401)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('401 Unauthorized', function() { pm.response.to.have.status(401); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/sheet-materials/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\":\"Intento anonimo\",\"thickness_mm\":\"1.00\",\"max_width_mm\":\"500\",\"max_length_mm\":\"1000\"}" }
+          }
+        },
+        {
+          "name": "PUT material - JEFE (debe funcionar)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('200 OK', function() { pm.response.to.have.status(200); });"
+          ]}}],
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/sheet-materials/{{material_id}}/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{jefe_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"name\":\"Chapa Editada\",\"thickness_mm\":\"2.00\",\"max_width_mm\":\"1200\",\"max_length_mm\":\"2400\"}" }
+          }
+        },
+        {
+          "name": "DELETE material - CLIENTE (debe fallar 403)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('403 Forbidden', function() { pm.response.to.have.status(403); });"
+          ]}}],
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/sheet-materials/{{material_id}}/",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cliente_token}}" }]
+          }
+        },
+        {
+          "name": "DELETE material - JEFE (debe funcionar)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('204 No Content', function() { pm.response.to.have.status(204); });"
+          ]}}],
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/sheet-materials/{{material_id}}/",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jefe_token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "CRUD - Roles (Usuarios - BUGS)",
+      "item": [
+        {
+          "name": "GET users - CLIENTE (BUG: debe fallar pero devuelve 200)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('BUG: 200 en vez de 403', function() { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array'); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/users/",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cliente_token}}" }]
+          }
+        },
+        {
+          "name": "DELETE user - CLIENTE (BUG: debe fallar pero devuelve 204)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('BUG: 204 en vez de 403', function() { pm.response.to.have.status(204); });"
+          ]}}],
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/users/4/",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cliente_token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Logica de Negocio",
+      "item": [
+        {
+          "name": "Registro - Email duplicado (BUG)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('BUG: 201 en vez de 400', function() { pm.response.to.have.status(201); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/register/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"username\":\"duplicado\",\"email\":\"cliente@test.com\",\"password\":\"test123456\"}" }
+          }
+        },
+        {
+          "name": "Registro - Usuario nuevo (debe funcionar)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('201 Created', function() { pm.response.to.have.status(201); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/register/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"username\":\"nuevouser\",\"email\":\"nuevo@test.com\",\"password\":\"test123456\"}" }
+          }
+        },
+        {
+          "name": "Crear pedido vacio (BUG: sin validacion)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('BUG: 201 en vez de 400', function() { pm.response.to.have.status(201); var j = pm.response.json(); pm.collectionVariables.set('order_id', j.id); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/orders/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{cliente_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"notes\":\"Pedido vacio de prueba\"}" }
+          }
+        },
+        {
+          "name": "Crear order-item (BUG: sin validacion stock)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('BUG: 201 en vez de 400', function() { pm.response.to.have.status(201); var j = pm.response.json(); pm.collectionVariables.set('order_item_id', j.id); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/order-items/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{cliente_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"order\":\"{{order_id}}\",\"sheet_material\":1,\"width_mm\":\"500\",\"length_mm\":\"1000\",\"thickness_mm\":\"1.50\",\"shape\":\"Rectangular\",\"folds\":\"Sin pliegues\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Flujo Completo",
+      "item": [
+        {
+          "name": "1. Login CLIENTE",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('200 OK', function() { pm.response.to.have.status(200); var j = pm.response.json(); pm.collectionVariables.set('cliente_token', j.access); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/token/",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"username\":\"cliente\",\"password\":\"cliente1234\"}" }
+          }
+        },
+        {
+          "name": "2. Ver materiales",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('200 OK', function() { pm.response.to.have.status(200); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/sheet-materials/",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cliente_token}}" }]
+          }
+        },
+        {
+          "name": "3. Crear pedido",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('201 Created', function() { pm.response.to.have.status(200); var j = pm.response.json(); pm.collectionVariables.set('order_id', j.id); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/orders/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{cliente_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"notes\":\"Flujo completo de prueba\"}" }
+          }
+        },
+        {
+          "name": "4. Agregar item al pedido",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('201 Created', function() { pm.response.to.have.status(200); });"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/order-items/",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{cliente_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"order\":\"{{order_id}}\",\"sheet_material\":1,\"width_mm\":\"600\",\"length_mm\":\"1200\",\"thickness_mm\":\"1.50\",\"shape\":\"Rectangular\",\"folds\":\"Doblez a 90 grados\"}" }
+          }
+        },
+        {
+          "name": "5. Verificar pedido con items",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('200 OK', function() { pm.response.to.have.status(200); var j = pm.response.json(); pm.expect(j.items).to.be.an('array').with.length.above(0); });"
+          ]}}],
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/orders/{{order_id}}/",
+            "header": [{ "key": "Authorization", "value": "Bearer {{cliente_token}}" }]
+          }
+        }
+      ]
+    }
+  ]
+}

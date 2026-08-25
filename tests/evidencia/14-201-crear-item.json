@@ -1,0 +1,13 @@
+{
+  "id": 2,
+  "width_mm": "500.00",
+  "length_mm": "1000.00",
+  "thickness_mm": "1.50",
+  "shape": "Rectangular",
+  "folds": "Sin pliegues",
+  "blueprint": null,
+  "created_at": "2026-08-22T20:13:35.076801Z",
+  "updated_at": "2026-08-22T20:13:35.076819Z",
+  "order": 8,
+  "sheet_material": 2
+}

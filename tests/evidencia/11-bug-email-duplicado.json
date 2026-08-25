@@ -1,0 +1,8 @@
+{
+  "status": 400,
+  "body": {
+    "username": [
+      "A user with that username already exists."
+    ]
+  }
+}
