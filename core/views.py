@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, SheetMaterial, Order, OrderItem
 from .permissions import (
+    IsAdminOrVendedor,
     IsPublicReadOrStaffWrite,
     IsOrderOwnerOrStaff,
 )
@@ -50,6 +51,7 @@ class LogoutView(APIView):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAdminOrVendedor]
 
 
 class SheetMaterialViewSet(viewsets.ModelViewSet):
@@ -81,3 +83,10 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        item = serializer.save()
+        sheet_material = item.sheet_material
+        if sheet_material and sheet_material.stock > 0:
+            sheet_material.stock -= 1
+            sheet_material.save(update_fields=['stock'])
