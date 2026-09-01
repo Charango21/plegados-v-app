@@ -13,6 +13,7 @@ class User(AbstractUser):
         choices=Role.choices,
         default=Role.CLIENTE,
     )
+    email = models.EmailField(unique=True, verbose_name='correo electronico')
     phone = models.CharField(max_length=20, blank=True, null=True)
     address = models.CharField(max_length=255, blank=True, null=True)
 
@@ -28,12 +29,13 @@ class SheetMaterial(models.Model):
     thickness_mm = models.DecimalField(max_digits=5, decimal_places=2)
     max_width_mm = models.DecimalField(max_digits=6, decimal_places=2)
     max_length_mm = models.DecimalField(max_digits=6, decimal_places=2)
+    stock = models.PositiveIntegerField(default=0, verbose_name='stock disponible')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name} ({self.thickness_mm}mm)"
+        return f"{self.name} ({self.thickness_mm}mm) - Stock: {self.stock}"
 
 
 class Order(models.Model):

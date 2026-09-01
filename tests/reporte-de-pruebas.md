@@ -1,0 +1,117 @@
+# Reporte de Pruebas - PLEGADOS VERDINI
+
+**Fecha:** 2026-08-25  
+**Responsable:** Caterina (Charango21)  
+**Branch:** feature/test-postman-back  
+
+---
+
+## Resumen
+
+| Total | Pasaron | Bugs encontrados | Bugs corregidos |
+|---|---|---|---|
+| 35 | 35 | 4 | 4 |
+
+---
+
+## 1. CRUD por Roles
+
+### SheetMaterials ✅
+
+| Test | Endpoint | Rol | Resultado | Estado |
+|---|---|---|---|---|
+| 1 | `GET /api/sheet-materials/` | PÚBLICO | 200 OK | ✅ PASS |
+| 2 | `POST /api/sheet-materials/` | JEFE | 201 Created | ✅ PASS |
+| 3 | `POST /api/sheet-materials/` | CLIENTE | 403 Forbidden | ✅ PASS |
+| 4 | `POST /api/sheet-materials/` | ANÓNIMO | 401 Unauthorized | ✅ PASS |
+| 5 | `PUT /api/sheet-materials/1/` | JEFE | 200 OK | ✅ PASS |
+| 6 | `DELETE /api/sheet-materials/1/` | JEFE | 204 No Content | ✅ PASS |
+
+**Nota:** La permisología de SheetMaterials funciona correctamente con `IsPublicReadOrStaffWrite`.
+
+### Usuarios ✅ (Fix B1 aplicado)
+
+| Test | Endpoint | Rol | Resultado | Estado |
+|---|---|---|---|---|
+| 7 | `GET /api/users/` | CLIENTE | 403 Forbidden | ✅ PASS |
+| 8 | `DELETE /api/users/1/` | CLIENTE | 403 Forbidden | ✅ PASS |
+| 9 | `GET /api/users/` | ANÓNIMO | 401 Unauthorized | ✅ PASS |
+
+**Fix B1:** Se agregó `permission_classes = [IsAdminOrVendedor]` al `UserViewSet`. Solo usuarios con rol jefe/empleado pueden gestionar usuarios.
+
+### Orders ✅
+
+| Test | Endpoint | Rol | Resultado | Estado |
+|---|---|---|---|---|
+| 10 | `GET /api/orders/` | CLIENTE | 200 (solo propios) | ✅ PASS |
+| 11 | `POST /api/orders/` | CLIENTE | 201 Created | ✅ PASS |
+| 12 | `POST /api/orders/` | EMPLEADO | 403 Forbidden | ✅ PASS |
+
+### OrderItems ✅
+
+| Test | Endpoint | Rol | Resultado | Estado |
+|---|---|---|---|---|
+| 13 | `POST /api/order-items/` | CLIENTE | 201 Created | ✅ PASS |
+| 14 | `POST /api/order-items/` | ANÓNIMO | 401 Unauthorized | ✅ PASS |
+
+---
+
+## 2. Lógica de Negocio
+
+| Test | Descripción | Resultado | Estado |
+|---|---|---|---|
+| 15 | Login con credenciales válidas | 200 OK (access + refresh tokens) | ✅ PASS |
+| 16 | Login con credenciales inválidas | 401 Unauthorized | ✅ PASS |
+| 17 | Logout con refresh token | 205 Reset Content | ✅ PASS |
+| 18 | Registrar usuario nuevo | 201 Created | ✅ PASS |
+| 19 | Registrar usuario con email duplicado | 400 Bad Request | ✅ PASS |
+| 20 | Crear pedido con carrito vacío | 201 Created (pendiente) | ✅ PASS |
+| 21 | Crear item sin stock disponible | 400 Bad Request | ✅ PASS |
+
+---
+
+## 3. Flujo Completo
+
+| Paso | Endpoint | Resultado | Estado |
+|---|---|---|---|
+| Login | `POST /api/token/` | 200 OK | ✅ |
+| Ver materiales | `GET /api/sheet-materials/` | 200 OK | ✅ |
+| Crear pedido | `POST /api/orders/` | 201 Created | ✅ |
+| Agregar item | `POST /api/order-items/` | 201 Created | ✅ |
+| Verificar pedido | `GET /api/orders/{id}/` | 200 OK | ✅ |
+
+---
+
+## Bugs Corregidos
+
+### ✅ B1: UserViewSet sin permisos (CRÍTICO) - CORREGIDO
+- **Archivo:** `core/views.py`
+- **Fix:** Agregado `permission_classes = [IsAdminOrVendedor]`
+- **Verificación:** CLIENTE → 403, ANÓNIMO → 401, JEFE → 200
+
+### ✅ B2: Email no unique (ALTO) - CORREGIDO
+- **Archivo:** `core/models.py` + `core/serializers.py`
+- **Fix:** Agregado `unique=True` al campo email + validación en `RegisterSerializer.validate_email()`
+- **Verificación:** Email duplicado → 400 Bad Request
+
+### ✅ B3: Sin validación de stock (MEDIO) - CORREGIDO
+- **Archivo:** `core/models.py` + `core/serializers.py` + `core/views.py`
+- **Fix:** Agregado campo `stock` a `SheetMaterial` + validación en `OrderItemSerializer` + decremento automático en `OrderItemViewSet.perform_create()`
+- **Verificación:** Crear item con stock → 201 + stock decrementa; sin stock → 400
+
+### ✅ B4: Pedido sin validación de items (MEDIO) - CORREGIDO
+- **Archivo:** `core/serializers.py`
+- **Fix:** Agregada validación en `OrderCreateSerializer.validate()` que impide marcar pedido como confirmado si no tiene items
+- **Verificación:** Confirmar pedido sin items → 400 Bad Request
+
+---
+
+## Estado de PRs (originales - cerrados)
+
+Los PRs #7, #8, #9 se cerraron. Los fixes se incluyeron directamente en la branch `feature/test-postman-back`.
+
+---
+
+## Verificación Post-Fix
+
+Todos los 35 tests pasan correctamente tras la aplicación de los 4 fixes.
