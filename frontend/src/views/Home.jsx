@@ -3,28 +3,30 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
+import { API_URL } from '../config'
 import logo from '../assets/PV.png'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
-
 function Home() {
-  const { user } = useAuth()
+  const { user, apiFetch } = useAuth()
   const [orders, setOrders] = useState([])
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const token = localStorage.getItem('access')
-    if (!token) return
-    fetch(`${API_URL}/orders/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    if (!user) return
+    apiFetch('/orders/')
       .then((res) => {
+        if (res.status === 401) {
+          setError('Sesión expirada. Volvé a iniciar sesión.')
+          return
+        }
         if (!res.ok) throw new Error('No se pudieron cargar los pedidos')
         return res.json()
       })
-      .then((data) => setOrders(data.results || data.value || data))
+      .then((data) => {
+        if (data) setOrders(data.results || data.value || data)
+      })
       .catch((err) => setError(err.message))
-  }, [])
+  }, [user, apiFetch])
 
   const ROLE_LABELS = { jefe: 'Jefe', empleado: 'Empleado', cliente: 'Cliente' }
 
