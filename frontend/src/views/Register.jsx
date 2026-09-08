@@ -18,7 +18,7 @@ function Register() {
     if (error) setError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!username.trim() || !email.trim() || !password || !confirmPassword) {
       setError('Completá todos los campos')
@@ -36,13 +36,11 @@ function Register() {
       setError('Las contraseñas no coinciden')
       return
     }
-    const result = register(username.trim(), email.trim(), password)
-    if (result.ok) {
+    try {
+      await register(username.trim(), email.trim(), password)
       navigate('/login')
-    } else if (result.code === 'user_exists') {
-      setError('Ese usuario ya existe')
-    } else if (result.code === 'email_exists') {
-      setError('Ese email ya está registrado')
+    } catch (err) {
+      setError(err.message || 'Error al registrarse')
     }
   }
 

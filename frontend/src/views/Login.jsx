@@ -13,16 +13,17 @@ function Login() {
 
   const from = location.state?.from?.pathname || '/'
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!username.trim() || !password) {
       setError('Completá el usuario y la contraseña')
       return
     }
-    if (login(username.trim(), password)) {
+    try {
+      await login(username.trim(), password)
       navigate(from, { replace: true })
-    } else {
-      setError('Usuario o contraseña incorrectos')
+    } catch (err) {
+      setError(err.message || 'Usuario o contraseña incorrectos')
     }
   }
 
