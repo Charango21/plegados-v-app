@@ -3,3 +3,5 @@ tp1.md
 __pycache__/
 *.pyc
 *.log
+.env
+node_modules/

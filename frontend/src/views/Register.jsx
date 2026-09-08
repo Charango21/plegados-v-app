@@ -13,12 +13,13 @@ function Register() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const clearError = () => {
     if (error) setError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!username.trim() || !email.trim() || !password || !confirmPassword) {
       setError('Completá todos los campos')
@@ -36,13 +37,15 @@ function Register() {
       setError('Las contraseñas no coinciden')
       return
     }
-    const result = register(username.trim(), email.trim(), password)
-    if (result.ok) {
+    setIsSubmitting(true)
+    setError('')
+    try {
+      await register(username.trim(), email.trim(), password)
       navigate('/login')
-    } else if (result.code === 'user_exists') {
-      setError('Ese usuario ya existe')
-    } else if (result.code === 'email_exists') {
-      setError('Ese email ya está registrado')
+    } catch (err) {
+      setError(err.message || 'Error al registrarse')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -63,6 +66,7 @@ function Register() {
               setUsername(e.target.value)
               clearError()
             }}
+            disabled={isSubmitting}
           />
         </div>
         <div className="mb-3">
@@ -79,6 +83,7 @@ function Register() {
               setEmail(e.target.value)
               clearError()
             }}
+            disabled={isSubmitting}
           />
         </div>
         <div className="mb-3">
@@ -95,6 +100,7 @@ function Register() {
               setPassword(e.target.value)
               clearError()
             }}
+            disabled={isSubmitting}
           />
         </div>
         <div className="mb-3">
@@ -111,6 +117,7 @@ function Register() {
               setConfirmPassword(e.target.value)
               clearError()
             }}
+            disabled={isSubmitting}
           />
         </div>
         {error && (
@@ -118,8 +125,12 @@ function Register() {
             {error}
           </div>
         )}
-        <button type="submit" className="btn btn-primary w-100">
-          Crear cuenta
+        <button
+          type="submit"
+          className="btn btn-primary w-100"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
         </button>
       </form>
       <p className="text-center mt-3 mb-0 small">

@@ -10,19 +10,25 @@ function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const from = location.state?.from?.pathname || '/'
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!username.trim() || !password) {
       setError('Completá el usuario y la contraseña')
       return
     }
-    if (login(username.trim(), password)) {
+    setIsSubmitting(true)
+    setError('')
+    try {
+      await login(username.trim(), password)
       navigate(from, { replace: true })
-    } else {
-      setError('Usuario o contraseña incorrectos')
+    } catch (err) {
+      setError(err.message || 'Usuario o contraseña incorrectos')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -43,6 +49,7 @@ function Login() {
               setUsername(e.target.value)
               if (error) setError('')
             }}
+            disabled={isSubmitting}
           />
         </div>
         <div className="mb-3">
@@ -59,6 +66,7 @@ function Login() {
               setPassword(e.target.value)
               if (error) setError('')
             }}
+            disabled={isSubmitting}
           />
         </div>
         {error && (
@@ -66,8 +74,12 @@ function Login() {
             {error}
           </div>
         )}
-        <button type="submit" className="btn btn-primary w-100">
-          Entrar
+        <button
+          type="submit"
+          className="btn btn-primary w-100"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Ingresando...' : 'Entrar'}
         </button>
       </form>
       <p className="text-center mt-3 mb-0 small">
