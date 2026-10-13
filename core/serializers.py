@@ -1,5 +1,42 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import User, SheetMaterial, Order, OrderItem
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['username'] = user.username
+        token['role'] = user.role
+        return token
+
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Credenciales incorrectas')
+
+        if not user.check_password(password):
+            raise serializers.ValidationError('Credenciales incorrectas')
+
+        if not user.is_active:
+            raise serializers.ValidationError('Usuario desactivado')
+
+        data = {}
+        refresh = self.get_token(user)
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
+        data['user'] = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'role': user.role,
+        }
+        return data
 
 
 class RegisterSerializer(serializers.ModelSerializer):
