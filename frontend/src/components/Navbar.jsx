@@ -56,15 +56,15 @@ function Navbar() {
                 </li>
                 {isStaff && (
                   <li className="nav-item">
-                    <NavLink className="nav-link fw-semibold" to="/admin-panel">
+                    <NavLink className="nav-link fw-semibold text-warning" to="/admin-panel">
                       Panel Admin ⚙️
                     </NavLink>
                   </li>
                 )}
                 <li className="nav-item ms-lg-2">
-                  <span className="nav-link text-white-50">
-                    {user.username} <small>({user.role})</small>
-                  </span>
+                  <NavLink className="nav-link text-white-50" to="/perfil" title="Ver mi perfil">
+                    👤 {user.username} <small>({user.role})</small>
+                  </NavLink>
                 </li>
                 <li className="nav-item ms-lg-2">
                   <button

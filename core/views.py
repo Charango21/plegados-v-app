@@ -25,7 +25,7 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 
-class ProfileView(generics.RetrieveAPIView):
+class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 

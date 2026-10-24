@@ -10,14 +10,17 @@ import Materials from './views/Materials'
 import MaterialDetail from './views/MaterialDetail'
 import OrderCreate from './views/OrderCreate'
 import MyOrders from './views/MyOrders'
+import Profile from './views/Profile'
 import AdminPanel from './views/AdminPanel'
+import NotFound from './views/NotFound'
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Ruta pública principal (Pantalla 1 del boceto) */}
+          {/* ================= VISTAS PÚBLICAS ================= */}
+          {/* Pantalla 1 del boceto (Home) */}
           <Route path="/" element={<Home />} />
 
           {/* Autenticación (Pantallas 2 y 3 del boceto) */}
@@ -38,13 +41,31 @@ function App() {
             }
           />
 
-          {/* Hacer pedido / Mi pedido (Pantalla 5 del boceto) */}
-          <Route path="/hacer-pedido" element={<OrderCreate />} />
-          <Route path="/pedidos/nuevo" element={<OrderCreate />} />
-
-          {/* Explorar materiales y detalle (Paso 2 TP9) */}
+          {/* Catálogo de chapas y detalle (Paso 2 TP9) */}
           <Route path="/materials" element={<Materials />} />
           <Route path="/materials/:id" element={<MaterialDetail />} />
+
+          {/* Explorar confección de pedido (público para configurar medidas) */}
+          <Route path="/hacer-pedido" element={<OrderCreate />} />
+
+          {/* ================= VISTAS AUTENTICADAS (Paso 5: ProtectedRoute) ================= */}
+          {/* Creación de pedido / Checkout formal protegido */}
+          <Route
+            path="/pedidos/nuevo"
+            element={
+              <ProtectedRoute>
+                <OrderCreate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <OrderCreate />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Historial de pedidos del cliente (Pantalla 4 del boceto) */}
           <Route
@@ -64,7 +85,26 @@ function App() {
             }
           />
 
-          {/* Panel de administración (Paso 4 TP9 - solo Jefe y Empleados) */}
+          {/* Perfil de usuario (Ver y editar datos personales) */}
+          <Route
+            path="/perfil"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Navigate to="/perfil" replace />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ================= VISTAS DE ADMINISTRACIÓN (Paso 5: AdminRoute) ================= */}
+          {/* Solo accesible para roles Staff: 'jefe' o 'empleado' */}
           <Route
             path="/admin-panel"
             element={
@@ -81,6 +121,9 @@ function App() {
               </AdminRoute>
             }
           />
+
+          {/* ================= RUTA 404 NO ENCONTRADA ================= */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
