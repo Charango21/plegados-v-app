@@ -40,8 +40,18 @@ function Navbar() {
                 Inicio
               </NavLink>
             </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/hacer-pedido">
+                Hacer pedido
+              </NavLink>
+            </li>
             {user ? (
               <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/mis-pedidos">
+                    Mis pedidos
+                  </NavLink>
+                </li>
                 <li className="nav-item">
                   <span className="nav-link text-white-50">
                     {user.username}
@@ -60,13 +70,13 @@ function Navbar() {
             ) : (
               <>
                 <li className="nav-item">
-                  <NavLink className="nav-link" to="/login">
-                    Ingresar
+                  <NavLink className="nav-link" to="/register">
+                    Registrarse
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink className="nav-link" to="/register">
-                    Registrarse
+                  <NavLink className="nav-link" to="/login">
+                    Iniciar sesión
                   </NavLink>
                 </li>
               </>

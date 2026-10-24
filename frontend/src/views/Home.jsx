@@ -49,9 +49,14 @@ function Home() {
           <p className="lead mb-4">
             Pliegues de chapa a medida para tu proyecto
           </p>
-          <Link to="/register" className="btn btn-light btn-lg">
-            Hacer un pedido
-          </Link>
+          <div className="d-flex justify-content-center gap-3">
+            <Link to="/hacer-pedido" className="btn btn-light btn-lg">
+              Hacer mi pedido
+            </Link>
+            <a href="#servicios" className="btn btn-outline-light btn-lg">
+              Nuestros trabajos
+            </a>
+          </div>
         </div>
       </header>
       <section className="bg-light py-5 flex-grow-1">
@@ -86,7 +91,7 @@ function Home() {
               </div>
             </div>
           )}
-          <div className="row g-4">
+          <div className="row g-4" id="servicios">
             <div className="col-md-4">
               <div className="card h-100">
                 <div className="card-body">
