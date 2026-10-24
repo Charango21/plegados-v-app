@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthProvider'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
+import AdminRoute from './components/AdminRoute'
 import Home from './views/Home'
 import Login from './views/Login'
 import Register from './views/Register'
@@ -9,6 +10,7 @@ import Materials from './views/Materials'
 import MaterialDetail from './views/MaterialDetail'
 import OrderCreate from './views/OrderCreate'
 import MyOrders from './views/MyOrders'
+import AdminPanel from './views/AdminPanel'
 
 function App() {
   return (
@@ -44,7 +46,7 @@ function App() {
           <Route path="/materials" element={<Materials />} />
           <Route path="/materials/:id" element={<MaterialDetail />} />
 
-          {/* Historial de pedidos (Pantalla 4 del boceto) */}
+          {/* Historial de pedidos del cliente (Pantalla 4 del boceto) */}
           <Route
             path="/mis-pedidos"
             element={
@@ -59,6 +61,24 @@ function App() {
               <ProtectedRoute>
                 <Navigate to="/mis-pedidos" replace />
               </ProtectedRoute>
+            }
+          />
+
+          {/* Panel de administración (Paso 4 TP9 - solo Jefe y Empleados) */}
+          <Route
+            path="/admin-panel"
+            element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminPanel />
+              </AdminRoute>
             }
           />
         </Routes>

@@ -11,6 +11,8 @@ function Navbar() {
     navigate('/login')
   }
 
+  const isStaff = user && (user.role === 'jefe' || user.role === 'empleado')
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark navbar-sketch">
       <div className="container">
@@ -52,9 +54,16 @@ function Navbar() {
                     Mis pedidos
                   </NavLink>
                 </li>
+                {isStaff && (
+                  <li className="nav-item">
+                    <NavLink className="nav-link fw-semibold" to="/admin-panel">
+                      Panel Admin ⚙️
+                    </NavLink>
+                  </li>
+                )}
                 <li className="nav-item ms-lg-2">
                   <span className="nav-link text-white-50">
-                    {user.username}
+                    {user.username} <small>({user.role})</small>
                   </span>
                 </li>
                 <li className="nav-item ms-lg-2">
