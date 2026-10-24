@@ -33,7 +33,7 @@ function Login() {
   }
 
   return (
-    <AuthLayout title="Ingresar">
+    <AuthLayout title="Iniciar sesión">
       <form onSubmit={handleSubmit} noValidate>
         <div className="mb-3">
           <label htmlFor="username" className="form-label">
@@ -76,14 +76,17 @@ function Login() {
         )}
         <button
           type="submit"
-          className="btn btn-primary w-100"
+          className="sketch-btn-outline w-100 mt-2"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Ingresando...' : 'Entrar'}
+          {isSubmitting ? 'Ingresando...' : 'Iniciar sesión'}
         </button>
       </form>
-      <p className="text-center mt-3 mb-0 small">
-        ¿No tenés cuenta? <Link to="/register">Registrate</Link>
+      <p className="text-center mt-3 mb-0 text-white-50 small">
+        ¿No tenés cuenta?{' '}
+        <Link to="/register" className="text-white text-decoration-underline">
+          Registrate
+        </Link>
       </p>
     </AuthLayout>
   )

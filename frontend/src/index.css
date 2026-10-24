@@ -1,4 +1,151 @@
+:root {
+  --pv-navbar: #12005c;
+  --pv-bg: #f7f7f7;
+  --pv-card-bg: #121212;
+  --pv-card-text: #ffffff;
+  --pv-border-radius: 28px;
+  --pv-card-inner: #ffffff;
+  --pv-accent-orange: #f28e2b;
+  --pv-accent-blue: #1e3a8a;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
+  background-color: var(--pv-bg);
+  color: #121212;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Navbar con el color exacto del boceto */
+.navbar-sketch {
+  background-color: var(--pv-navbar) !important;
+  box-shadow: 0 4px 16px rgba(18, 0, 92, 0.2);
+}
+
+.navbar-sketch .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navbar-sketch .nav-link:hover,
+.navbar-sketch .nav-link.active {
+  color: #ffffff !important;
+}
+
+/* Tarjetas oscuras redondeadas del boceto (Pantallas 2, 3, 4 y 5) */
+.sketch-card {
+  background-color: var(--pv-card-bg);
+  color: var(--pv-card-text);
+  border-radius: var(--pv-border-radius);
+  border: 1px solid #232323;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Recuadro interior blanco/claro del boceto (Pantalla 5 - detalle de chapa/preview) */
+.sketch-inner-box {
+  background-color: var(--pv-card-inner);
+  color: #121212;
+  border-radius: 22px;
+  padding: 1.5rem;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Inputs con estilo oscuro del boceto */
+.sketch-input,
+.sketch-card .form-control,
+.sketch-card .form-select {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border: 1px solid #383838 !important;
+  border-radius: 12px;
+  padding: 0.65rem 0.95rem;
+}
+
+.sketch-card .form-control:focus,
+.sketch-card .form-select:focus {
+  background-color: #222222 !important;
+  color: #ffffff !important;
+  border-color: #7b5cf0 !important;
+  box-shadow: 0 0 0 0.25rem rgba(123, 92, 240, 0.25) !important;
+}
+
+.sketch-card .form-label {
+  color: #f0f0f0;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+/* Botones redondeados del boceto */
+.sketch-btn-outline {
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
+  background-color: transparent;
+  border-radius: 12px;
+  font-weight: 500;
+  padding: 0.6rem 1.4rem;
+  transition: all 0.2s ease;
+}
+
+.sketch-btn-outline:hover {
+  background-color: #ffffff;
+  color: #121212;
+}
+
+.sketch-btn-light {
+  background-color: #ffffff;
+  color: #121212;
+  border: 1px solid #ffffff;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 0.7rem 1.6rem;
+  transition: all 0.2s ease;
+}
+
+.sketch-btn-light:hover {
+  background-color: #e5e5e5;
+  color: #000000;
+}
+
+.sketch-btn-primary {
+  background-color: var(--pv-navbar);
+  color: #ffffff;
+  border: 1px solid #3b289c;
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 0.7rem 1.6rem;
+  transition: all 0.2s ease;
+}
+
+.sketch-btn-primary:hover {
+  background-color: #1e0582;
+  color: #ffffff;
+}
+
+/* Tabla oscura del boceto (Pantalla 4 - Mis Pedidos) */
+.sketch-table {
+  color: #ffffff;
+  background-color: transparent;
+}
+
+.sketch-table th {
+  background-color: #1a1a1a;
+  color: #cfcfcf;
+  border-bottom: 2px solid #333333;
+  padding: 1rem;
+  font-weight: 600;
+}
+
+.sketch-table td {
+  background-color: #121212;
+  color: #f0f0f0;
+  border-bottom: 1px solid #292929;
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.sketch-table tr:hover td {
+  background-color: #1a1a1a;
 }

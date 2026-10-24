@@ -12,14 +12,14 @@ function Navbar() {
   }
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav className="navbar navbar-expand-lg navbar-dark navbar-sketch">
       <div className="container">
-        <Link className="navbar-brand" to="/">
+        <Link className="navbar-brand d-flex align-items-center" to="/">
           <img
             src={logo}
             alt="PLEGADOS VERDINI"
-            height="40"
-            className="d-inline-block align-top"
+            height="38"
+            className="d-inline-block align-top me-2"
           />
         </Link>
         <button
@@ -34,7 +34,7 @@ function Navbar() {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
+          <ul className="navbar-nav ms-auto align-items-lg-center">
             <li className="nav-item">
               <NavLink className="nav-link" to="/" end>
                 Inicio
@@ -52,15 +52,15 @@ function Navbar() {
                     Mis pedidos
                   </NavLink>
                 </li>
-                <li className="nav-item">
+                <li className="nav-item ms-lg-2">
                   <span className="nav-link text-white-50">
                     {user.username}
                   </span>
                 </li>
-                <li className="nav-item">
+                <li className="nav-item ms-lg-2">
                   <button
                     type="button"
-                    className="btn btn-outline-light btn-sm ms-2"
+                    className="sketch-btn-outline btn-sm py-1 px-3"
                     onClick={handleLogout}
                   >
                     Cerrar sesión
@@ -69,12 +69,12 @@ function Navbar() {
               </>
             ) : (
               <>
-                <li className="nav-item">
+                <li className="nav-item ms-lg-2">
                   <NavLink className="nav-link" to="/register">
                     Registrarse
                   </NavLink>
                 </li>
-                <li className="nav-item">
+                <li className="nav-item ms-lg-2">
                   <NavLink className="nav-link" to="/login">
                     Iniciar sesión
                   </NavLink>

@@ -22,11 +22,12 @@ function MaterialDetail() {
   const isAvailable = material && material.is_active && material.stock > 0
 
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="d-flex flex-column min-vh-100" style={{ backgroundColor: 'var(--pv-bg)' }}>
       <Navbar />
-      <section className="py-5 flex-grow-1 bg-light">
+
+      <main className="py-5 flex-grow-1">
         <div className="container">
-          <Link to="/hacer-pedido" className="btn btn-link ps-0 mb-3">
+          <Link to="/hacer-pedido" className="btn btn-link text-dark ps-0 mb-3 text-decoration-none">
             ← Volver a selección de materiales
           </Link>
 
@@ -35,7 +36,7 @@ function MaterialDetail() {
               <div className="spinner-border text-primary" role="status">
                 <span className="visually-hidden">Cargando...</span>
               </div>
-              <p className="mt-2 text-muted">Cargando material...</p>
+              <p className="mt-2 text-muted">Cargando especificaciones del material...</p>
             </div>
           )}
 
@@ -52,51 +53,65 @@ function MaterialDetail() {
 
           {material && (
             <div className="row justify-content-center">
-              <div className="col-md-8">
-                <div className="card">
-                  <div className="card-body p-4">
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <h2 className="mb-0">{material.name}</h2>
-                      {!isAvailable && (
-                        <span className="badge bg-secondary fs-6">No disponible</span>
-                      )}
+              <div className="col-md-9 col-lg-8">
+                <div className="sketch-card p-4 p-md-5">
+                  <div className="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+                    <div>
+                      <span className="text-white-50 text-uppercase small" style={{ letterSpacing: '1px' }}>
+                        Ficha técnica de chapa
+                      </span>
+                      <h2 className="text-white mb-0 mt-1">{material.name}</h2>
                     </div>
-                    <table className="table table-striped mb-4">
+                    {isAvailable ? (
+                      <span className="badge bg-success py-2 px-3 fs-6">En Stock ({material.stock})</span>
+                    ) : (
+                      <span className="badge bg-secondary py-2 px-3 fs-6">Sin Stock</span>
+                    )}
+                  </div>
+
+                  <div className="sketch-inner-box mb-4">
+                    <h5 className="fw-bold mb-3">Límites y dimensiones</h5>
+                    <table className="table table-borderless mb-0">
                       <tbody>
                         <tr>
-                          <th>Espesor</th>
-                          <td>{material.thickness_mm} mm</td>
+                          <th className="text-muted" style={{ width: '45%' }}>Espesor nominal:</th>
+                          <td className="fw-semibold">{material.thickness_mm} mm</td>
                         </tr>
                         <tr>
-                          <th>Ancho máximo</th>
-                          <td>{material.max_width_mm} mm</td>
+                          <th className="text-muted">Ancho máximo admitido:</th>
+                          <td className="fw-semibold">{material.max_width_mm} mm</td>
                         </tr>
                         <tr>
-                          <th>Largo máximo</th>
-                          <td>{material.max_length_mm} mm</td>
+                          <th className="text-muted">Largo máximo admitido:</th>
+                          <td className="fw-semibold">{material.max_length_mm} mm</td>
                         </tr>
                         <tr>
-                          <th>Stock disponible</th>
-                          <td>{material.stock} unidades</td>
+                          <th className="text-muted">Stock disponible:</th>
+                          <td className="fw-semibold">{material.stock} unidades</td>
                         </tr>
                       </tbody>
                     </table>
-                    {isAvailable ? (
-                      <Link to={`/checkout?material=${material.id}`} className="btn btn-primary btn-lg w-100">
-                        Continuar con las medidas de mi pedido →
-                      </Link>
-                    ) : (
-                      <button className="btn btn-secondary btn-lg w-100" disabled>
-                        Material no disponible para pedidos
-                      </button>
-                    )}
                   </div>
+
+                  {isAvailable ? (
+                    <Link
+                      to={`/pedidos/nuevo?material=${material.id}`}
+                      className="sketch-btn-light w-100 py-3 text-center text-decoration-none d-block"
+                    >
+                      Continuar a "Mi pedido" (cargar medidas) →
+                    </Link>
+                  ) : (
+                    <button className="sketch-btn-outline w-100 py-3 text-center opacity-50" disabled>
+                      Material no disponible para pedidos actualmente
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           )}
         </div>
-      </section>
+      </main>
+
       <Footer />
     </div>
   )
