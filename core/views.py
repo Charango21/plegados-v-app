@@ -1,4 +1,4 @@
-from rest_framework import generics, viewsets
+from rest_framework import generics, filters, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,7 +25,7 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 
-class ProfileView(generics.RetrieveAPIView):
+class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
@@ -58,6 +58,8 @@ class SheetMaterialViewSet(viewsets.ModelViewSet):
     queryset = SheetMaterial.objects.all()
     serializer_class = SheetMaterialSerializer
     permission_classes = [IsPublicReadOrStaffWrite]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
 
 class OrderViewSet(viewsets.ModelViewSet):

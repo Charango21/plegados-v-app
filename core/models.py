@@ -30,6 +30,7 @@ class SheetMaterial(models.Model):
     max_width_mm = models.DecimalField(max_digits=6, decimal_places=2)
     max_length_mm = models.DecimalField(max_digits=6, decimal_places=2)
     stock = models.PositiveIntegerField(default=0, verbose_name='stock disponible')
+    is_active = models.BooleanField(default=True, verbose_name='disponible para pedidos')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

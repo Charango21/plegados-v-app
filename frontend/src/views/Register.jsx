@@ -50,7 +50,7 @@ function Register() {
   }
 
   return (
-    <AuthLayout title="Registrarse">
+    <AuthLayout title="Crear cuenta">
       <form onSubmit={handleSubmit} noValidate>
         <div className="mb-3">
           <label htmlFor="username" className="form-label">
@@ -127,14 +127,17 @@ function Register() {
         )}
         <button
           type="submit"
-          className="btn btn-primary w-100"
+          className="sketch-btn-outline w-100 mt-2"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Creando cuenta...' : 'Crear cuenta'}
+          {isSubmitting ? 'Creando cuenta...' : 'Registrarse'}
         </button>
       </form>
-      <p className="text-center mt-3 mb-0 small">
-        ¿Ya tenés cuenta? <Link to="/login">Ingresá</Link>
+      <p className="text-center mt-3 mb-0 text-white-50 small">
+        ¿Ya tenés cuenta?{' '}
+        <Link to="/login" className="text-white text-decoration-underline">
+          Iniciar sesión
+        </Link>
       </p>
     </AuthLayout>
   )
