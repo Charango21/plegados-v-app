@@ -112,6 +112,7 @@ function OrderCreate() {
 
     setIsSubmitting(true)
     setError('')
+    let createdOrderId = null
 
     try {
       // 1. Crear el Pedido (Order)
@@ -127,6 +128,7 @@ function OrderCreate() {
       }
 
       const orderData = await orderRes.json()
+      createdOrderId = orderData.id
 
       // 2. Crear el Item del Pedido (OrderItem) con medidas y plano
       const formData = new FormData()
@@ -154,6 +156,9 @@ function OrderCreate() {
 
       setSuccessOrder(orderData)
     } catch (err) {
+      if (createdOrderId) {
+        await apiFetch(`/orders/${createdOrderId}/`, { method: 'DELETE' }).catch(() => {})
+      }
       setError(err.message || 'Ocurrió un error al procesar el pedido')
     } finally {
       setIsSubmitting(false)

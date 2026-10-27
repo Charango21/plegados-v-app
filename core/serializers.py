@@ -12,29 +12,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
-        username = attrs.get('username')
-        password = attrs.get('password')
-
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            raise serializers.ValidationError('Credenciales incorrectas')
-
-        if not user.check_password(password):
-            raise serializers.ValidationError('Credenciales incorrectas')
-
-        if not user.is_active:
-            raise serializers.ValidationError('Usuario desactivado')
-
-        data = {}
-        refresh = self.get_token(user)
-        data['refresh'] = str(refresh)
-        data['access'] = str(refresh.access_token)
+        data = super().validate(attrs)
         data['user'] = {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'role': user.role,
+            'id': self.user.id,
+            'username': self.user.username,
+            'email': self.user.email,
+            'role': self.user.role,
         }
         return data
 
@@ -78,11 +61,29 @@ class OrderItemSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
+        request = self.context.get('request')
+        user = request.user if request else None
+        order = data.get('order')
         sheet_material = data.get('sheet_material')
-        if sheet_material and sheet_material.stock <= 0:
-            raise serializers.ValidationError(
-                f'No hay stock disponible de {sheet_material.name}.'
-            )
+
+        if user and user.is_authenticated and user.role not in ('jefe', 'empleado') and order and order.customer != user:
+            raise serializers.ValidationError('No puedes agregar ítems a un pedido que no te pertenece.')
+
+        if not sheet_material or not sheet_material.is_active:
+            raise serializers.ValidationError('El material seleccionado no está activo para pedidos.')
+
+        if sheet_material.stock <= 0:
+            raise serializers.ValidationError(f'No hay stock disponible de {sheet_material.name}.')
+
+        width = data.get('width_mm', 0)
+        length = data.get('length_mm', 0)
+
+        if width <= 0 or length <= 0:
+            raise serializers.ValidationError('El ancho y largo deben ser valores positivos mayores a cero.')
+
+        if width > sheet_material.max_width_mm or length > sheet_material.max_length_mm:
+            raise serializers.ValidationError('Las medidas superan los límites admitidos para esta chapa.')
+
         return data
 
 

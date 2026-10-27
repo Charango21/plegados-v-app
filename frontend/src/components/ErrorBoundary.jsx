@@ -1,5 +1,4 @@
 import React from 'react'
-import Navbar from './Navbar'
 import Footer from './Footer'
 
 class ErrorBoundary extends React.Component {
@@ -25,7 +24,9 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="d-flex flex-column min-vh-100" style={{ backgroundColor: 'var(--pv-bg)' }}>
-          <Navbar />
+          <div className="py-3 px-4 border-bottom border-secondary bg-dark text-white fw-bold">
+            Plegados V App
+          </div>
           <main className="flex-grow-1 d-flex align-items-center py-5">
             <div className="container">
               <div className="row justify-content-center">

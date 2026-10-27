@@ -12,7 +12,9 @@ function Login() {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const from = location.state?.from?.pathname || '/'
+  const from = location.state?.from
+    ? `${location.state.from.pathname}${location.state.from.search || ''}`
+    : '/'
 
   const handleSubmit = async (e) => {
     e.preventDefault()

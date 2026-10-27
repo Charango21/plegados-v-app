@@ -203,3 +203,72 @@ class FullFlowTest(APITestCase):
         # 6. Verificar stock decrementado
         mat.refresh_from_db()
         self.assertEqual(mat.stock, 49)
+
+
+class SheetMaterialActiveAndDimensionsTest(APITestCase):
+    """Verificación de is_active, dimensiones y perfil solicitadas en code review."""
+
+    def test_material_is_active_default_true(self):
+        mat = SheetMaterial.objects.create(
+            name="Chapa Activa Test", thickness_mm="1.00",
+            max_width_mm="1000", max_length_mm="2000", stock=5
+        )
+        self.assertTrue(mat.is_active)
+
+    def test_no_permitir_item_con_material_inactivo(self):
+        cliente = User.objects.create_user(username="cli_inactivo", password="password123", role="cliente", email="cli@inactivo.cl")
+        mat = SheetMaterial.objects.create(
+            name="Chapa Inactiva", thickness_mm="1.00",
+            max_width_mm="1000", max_length_mm="2000", stock=5, is_active=False
+        )
+        order = Order.objects.create(customer=cliente)
+        token = get_tokens(cliente)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+        r = self.client.post("/api/order-items/", {
+            "order": order.id,
+            "sheet_material": mat.id,
+            "width_mm": "100.00", "length_mm": "200.00",
+            "thickness_mm": "1.00", "shape": "U"
+        })
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_no_permitir_medidas_excedidas(self):
+        cliente = User.objects.create_user(username="cli_exceso", password="password123", role="cliente", email="cli@exceso.cl")
+        mat = SheetMaterial.objects.create(
+            name="Chapa Limite", thickness_mm="1.00",
+            max_width_mm="500", max_length_mm="500", stock=5
+        )
+        order = Order.objects.create(customer=cliente)
+        token = get_tokens(cliente)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+        r = self.client.post("/api/order-items/", {
+            "order": order.id,
+            "sheet_material": mat.id,
+            "width_mm": "600.00", "length_mm": "200.00",
+            "thickness_mm": "1.00", "shape": "U"
+        })
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileViewTest(APITestCase):
+    """Verificación de actualización de perfil."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test_profile", password="password123", email="profile@test.cl", role="cliente"
+        )
+        self.token = get_tokens(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.token}")
+
+    def test_actualizar_telefono_y_direccion(self):
+        r = self.client.patch("/api/profile/", {"phone": "11223344", "address": "Calle Falsa 123"})
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.phone, "11223344")
+        self.assertEqual(self.user.address, "Calle Falsa 123")
+
+    def test_no_puede_cambiar_su_propio_rol(self):
+        r = self.client.patch("/api/profile/", {"role": "jefe"})
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.role, "cliente")
