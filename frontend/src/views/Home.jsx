@@ -90,9 +90,9 @@ function Home() {
                 <Link to="/hacer-pedido" className="sketch-btn-primary text-decoration-none">
                   Hacer mi pedido
                 </Link>
-                <a href="#servicios" className="sketch-btn-outline text-decoration-none text-dark border-dark">
-                  Nuestros trabajos
-                </a>
+                <Link to="/materials" className="sketch-btn-outline text-decoration-none text-dark border-dark">
+                  Catálogo de Chapas
+                </Link>
               </div>
             </div>
           </div>
@@ -149,7 +149,7 @@ function Home() {
             </div>
             <div className="col-md-4">
               <div className="sketch-card h-100 p-4">
-                <h5 className="text-white mb-2">⚡ Nuestro trabajo</h5>
+                <h5 className="text-white mb-2">⚡ Calidad y Precisión</h5>
                 <p className="text-white-50 mb-0">
                   Pliegues de alta calidad industrial realizados por personal especializado con maquinaria precisa.
                 </p>

@@ -41,7 +41,7 @@ function Register() {
     setError('')
     try {
       await register(username.trim(), email.trim(), password)
-      navigate('/login')
+      navigate('/')
     } catch (err) {
       setError(err.message || 'Error al registrarse')
     } finally {
