@@ -10,6 +10,7 @@ from .views import (
     RegisterView,
     ProfileView,
     LogoutView,
+    HealthCheckView,
 )
 
 
@@ -25,6 +26,7 @@ router.register(r'order-items', OrderItemViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('health/', HealthCheckView.as_view(), name='health-check'),
     path('register/', RegisterView.as_view(), name='register'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('logout/', LogoutView.as_view(), name='logout'),
