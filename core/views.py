@@ -92,3 +92,10 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         if sheet_material and sheet_material.stock > 0:
             sheet_material.stock -= 1
             sheet_material.save(update_fields=['stock'])
+
+
+class HealthCheckView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response({"status": "ok", "service": "api"})

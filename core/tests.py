@@ -205,6 +205,13 @@ class FullFlowTest(APITestCase):
         self.assertEqual(mat.stock, 49)
 
 
+class HealthCheckTest(APITestCase):
+    def test_health_check_returns_200(self):
+        response = self.client.get('/api/health/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), {'status': 'ok', 'service': 'api'})
+
+
 class SheetMaterialActiveAndDimensionsTest(APITestCase):
     """Verificación de is_active, dimensiones y perfil solicitadas en code review."""
 
