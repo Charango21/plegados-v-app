@@ -88,6 +88,10 @@ export function AuthProvider({ children }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     })
+    const contentType = res.headers.get('content-type')
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('La API no está respondiendo con JSON. Verificá la URL de la API.')
+    }
     if (!res.ok) {
       const data = await res.json()
       throw new Error(data.detail || 'Usuario o contraseña incorrectos')
