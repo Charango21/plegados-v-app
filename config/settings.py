@@ -85,10 +85,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', 'postgresql://postgres:charango@localhost:5432/postgres'),
+        default=os.environ.get('DATABASE_URL'),
         conn_max_age=600,
+        ssl_require=True,
     )
 }
+
+if not DATABASES['default'].get('ENGINE'):
+    DATABASES['default'] = dj_database_url.parse(
+        os.environ.get('DATABASE_URL', 'postgresql://postgres:charango@localhost:5432/postgres'),
+        conn_max_age=600,
+    )
 
 
 
