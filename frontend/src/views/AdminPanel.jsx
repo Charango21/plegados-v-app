@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useAuth } from '../context/useAuth'
-import { apiGet, apiPost, apiPatch, apiDelete } from '../api'
+import { apiGet, apiPost, apiPatch, apiDelete, getMediaUrl } from '../api'
 
 function AdminPanel() {
   const { user } = useAuth()
@@ -34,11 +34,14 @@ function AdminPanel() {
   const [orderSuccess, setOrderSuccess] = useState('')
   const [statusFilter, setStatusFilter] = useState('todos')
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null)
+  const [brokenImages, setBrokenImages] = useState({})
 
   // ===================== ESTADOS: USUARIOS =====================
   const [usersList, setUsersList] = useState([])
   const [loadingUsers, setLoadingUsers] = useState(false)
   const [userError, setUserError] = useState('')
+  const [userSuccess, setUserSuccess] = useState('')
+  const [updatingUserId, setUpdatingUserId] = useState(null)
 
   // ===================== CARGAR MATERIALES =====================
   const fetchMaterials = useCallback(async () => {
@@ -181,6 +184,35 @@ function AdminPanel() {
       fetchOrders()
     } catch (err) {
       setOrderError(`Error al actualizar el estado del pedido #${orderId}: ${err.message}`)
+    }
+  }
+
+  // ===================== ACCIONES: USUARIOS (ROLES) =====================
+  const handleUpdateUserRole = async (targetUser, newRole) => {
+    if (targetUser.role === newRole) return
+
+    // Advertencia si el jefe se intenta cambiar el rol a sí mismo
+    if (targetUser.id === user?.id && newRole !== 'jefe') {
+      const confirmSelf = window.confirm(
+        '⚠️ Atención: estás cambiando tu propio rol de Jefe. Si continúas, perderás el acceso al Panel de Administración. ¿Deseas continuar?'
+      )
+      if (!confirmSelf) return
+    }
+
+    setUserError('')
+    setUserSuccess('')
+    setUpdatingUserId(targetUser.id)
+
+    try {
+      await apiPatch(`/users/${targetUser.id}/`, { role: newRole })
+      setUserSuccess(`Rol del usuario "${targetUser.username}" actualizado a "${newRole}".`)
+      setUsersList((prev) =>
+        prev.map((u) => (u.id === targetUser.id ? { ...u, role: newRole } : u))
+      )
+    } catch (err) {
+      setUserError(`No se pudo actualizar el rol de ${targetUser.username}: ${err.message}`)
+    } finally {
+      setUpdatingUserId(null)
     }
   }
 
@@ -424,7 +456,10 @@ function AdminPanel() {
                               <button
                                 type="button"
                                 className="sketch-btn-outline btn-sm py-1 px-2"
-                                onClick={() => setSelectedOrderDetails(o)}
+                                onClick={() => {
+                                  setBrokenImages({})
+                                  setSelectedOrderDetails(o)
+                                }}
                               >
                                 Ver pieza 📐
                               </button>
@@ -449,7 +484,16 @@ function AdminPanel() {
           {/* ===================== TAB 3: GESTIÓN DE USUARIOS (JEFE) ===================== */}
           {activeTab === 'users' && user?.role === 'jefe' && (
             <section>
-              <h4 className="mb-3">Usuarios Registrados en el Sistema</h4>
+              <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                  <h4 className="mb-0">Usuarios Registrados en el Sistema</h4>
+                  <small className="text-muted">
+                    Como Jefe del taller podés asignar o modificar roles a los usuarios.
+                  </small>
+                </div>
+              </div>
+
+              {userSuccess && <div className="alert alert-success py-2">{userSuccess}</div>}
               {userError && <div className="alert alert-danger py-2">{userError}</div>}
 
               {loadingUsers ? (
@@ -466,34 +510,59 @@ function AdminPanel() {
                           <th>ID</th>
                           <th>USUARIO</th>
                           <th>EMAIL</th>
-                          <th>ROL</th>
+                          <th>ROL ACTUAL</th>
+                          <th>CAMBIAR ROL</th>
                           <th>TELÉFONO</th>
                           <th>REGISTRADO</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {usersList.map((u) => (
-                          <tr key={u.id}>
-                            <td className="fw-bold text-white">#{u.id}</td>
-                            <td className="fw-semibold">{u.username}</td>
-                            <td>{u.email}</td>
-                            <td>
-                              <span
-                                className={`badge ${
-                                  u.role === 'jefe'
-                                    ? 'bg-danger'
-                                    : u.role === 'empleado'
-                                    ? 'bg-primary'
-                                    : 'bg-secondary'
-                                }`}
-                              >
-                                {u.role}
-                              </span>
-                            </td>
-                            <td>{u.phone || '-'}</td>
-                            <td className="small text-white-50">{formatDate(u.created_at)}</td>
-                          </tr>
-                        ))}
+                        {usersList.map((u) => {
+                          const isUpdating = updatingUserId === u.id
+                          return (
+                            <tr key={u.id}>
+                              <td className="fw-bold text-white">#{u.id}</td>
+                              <td className="fw-semibold">
+                                {u.username}
+                                {u.id === user?.id && (
+                                  <span className="badge bg-light text-dark ms-2">Tú</span>
+                                )}
+                              </td>
+                              <td>{u.email}</td>
+                              <td>
+                                <span
+                                  className={`badge ${
+                                    u.role === 'jefe'
+                                      ? 'bg-danger'
+                                      : u.role === 'empleado'
+                                      ? 'bg-primary'
+                                      : 'bg-secondary'
+                                  }`}
+                                >
+                                  {u.role}
+                                </span>
+                              </td>
+                              <td>
+                                <select
+                                  className="form-select form-select-sm"
+                                  style={{ maxWidth: '160px' }}
+                                  value={u.role}
+                                  disabled={isUpdating}
+                                  onChange={(e) => handleUpdateUserRole(u, e.target.value)}
+                                >
+                                  <option value="cliente">Cliente</option>
+                                  <option value="empleado">Empleado</option>
+                                  <option value="jefe">Jefe</option>
+                                </select>
+                                {isUpdating && (
+                                  <span className="small text-white-50 ms-1">Guardando...</span>
+                                )}
+                              </td>
+                              <td>{u.phone || '-'}</td>
+                              <td className="small text-white-50">{formatDate(u.created_at)}</td>
+                            </tr>
+                          )
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -627,7 +696,7 @@ function AdminPanel() {
                 style={{ maxWidth: '750px', width: '100%', maxHeight: '90vh' }}
               >
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                   <h4 className="text-white mb-0">Detalle del Pedido #{selectedOrderDetails.customer_order_number}</h4>
+                  <h4 className="text-white mb-0">Detalle del Pedido #{selectedOrderDetails.customer_order_number || selectedOrderDetails.id}</h4>
                   <button
                     type="button"
                     className="btn-close btn-close-white"
@@ -647,50 +716,64 @@ function AdminPanel() {
                 )}
 
                 <div className="row g-3">
-                  {(selectedOrderDetails.items || []).map((item, idx) => (
-                    <div key={item.id || idx} className="col-12">
-                      <div className="sketch-inner-box">
-                        <div className="d-flex justify-content-between align-items-center mb-2">
-                          <h6 className="fw-bold mb-0">
-                                 Ítem #{item.id} - Forma: {item.shape || 'Pieza'}
-                          </h6>
-                          <span className="badge bg-dark">
-                            {item.width_mm} mm x {item.length_mm} mm (e={item.thickness_mm} mm)
-                          </span>
-                        </div>
+                  {(selectedOrderDetails.items || []).map((item, idx) => {
+                    const resolvedBlueprint = getMediaUrl(item.blueprint)
+                    const isImgBroken = brokenImages[item.id || idx]
 
-                        {item.folds && (
-                          <p className="mb-2 small">
-                            <strong>Detalle de pliegues:</strong> {item.folds}
-                          </p>
-                        )}
-
-                        {item.blueprint ? (
-                          <div className="mt-3 p-2 bg-light border rounded text-center">
-                            <span className="d-block small text-muted mb-2">Plano o dibujo subido por el cliente:</span>
-                            <img
-                              src={item.blueprint}
-                              alt="Plano"
-                              className="img-fluid rounded shadow-sm"
-                              style={{ maxHeight: '280px', objectFit: 'contain' }}
-                            />
-                            <div className="mt-2">
-                              <a
-                                href={item.blueprint}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="btn btn-sm btn-dark"
-                              >
-                                Abrir en tamaño completo ↗
-                              </a>
-                            </div>
+                    return (
+                      <div key={item.id || idx} className="col-12">
+                        <div className="sketch-inner-box">
+                          <div className="d-flex justify-content-between align-items-center mb-2">
+                            <h6 className="fw-bold mb-0">
+                              Ítem #{item.id || idx + 1} - Forma: {item.shape || 'Pieza'}
+                            </h6>
+                            <span className="badge bg-dark">
+                              {item.width_mm} mm x {item.length_mm} mm (e={item.thickness_mm} mm)
+                            </span>
                           </div>
-                        ) : (
-                          <div className="mt-2 text-muted small fst-italic">Sin archivo de plano adjunto.</div>
-                        )}
+
+                          {item.folds && (
+                            <p className="mb-2 small">
+                              <strong>Detalle de pliegues:</strong> {item.folds}
+                            </p>
+                          )}
+
+                          {resolvedBlueprint ? (
+                            <div className="mt-3 p-2 bg-light border rounded text-center">
+                              <span className="d-block small text-muted mb-2">Plano o dibujo subido por el cliente:</span>
+                              {!isImgBroken ? (
+                                <img
+                                  src={resolvedBlueprint}
+                                  alt="Plano"
+                                  className="img-fluid rounded shadow-sm"
+                                  style={{ maxHeight: '280px', objectFit: 'contain' }}
+                                  onError={() => {
+                                    setBrokenImages((prev) => ({ ...prev, [item.id || idx]: true }))
+                                  }}
+                                />
+                              ) : (
+                                <div className="alert alert-warning py-2 small mb-2">
+                                  No se pudo previsualizar la imagen directamente. Probá abrirla desde el enlace inferior.
+                                </div>
+                              )}
+                              <div className="mt-2">
+                                <a
+                                  href={resolvedBlueprint}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="btn btn-sm btn-dark"
+                                >
+                                  Abrir plano en tamaño completo ↗
+                                </a>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="mt-2 text-muted small fst-italic">Sin archivo de plano adjunto.</div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
 
                 <div className="text-end mt-4">

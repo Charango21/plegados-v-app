@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useAuth } from '../context/useAuth'
+import { getMediaUrl } from '../api'
 
 function MyOrders() {
   const { user, apiFetch } = useAuth()
@@ -10,6 +11,7 @@ function MyOrders() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [expandedOrderId, setExpandedOrderId] = useState(null)
+  const [brokenImages, setBrokenImages] = useState({})
 
   useEffect(() => {
     setLoading(true)
@@ -119,7 +121,7 @@ function MyOrders() {
                       const itemsCount = order.items?.length || 0
                       return (
                         <tr key={order.id}>
-                         <td className="fw-bold text-white">#{order.customer_order_number}</td>
+                          <td className="fw-bold text-white">#{order.customer_order_number || order.id}</td>
                           <td>
                             {itemsCount > 0 ? (
                               <span>
@@ -158,7 +160,7 @@ function MyOrders() {
                 return (
                   <div className="mt-4 p-4 sketch-inner-box">
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                       <h5 className="mb-0 fw-bold">Detalle del Pedido #{order.customer_order_number}</h5>
+                      <h5 className="mb-0 fw-bold">Detalle del Pedido #{order.customer_order_number || order.id}</h5>
                       <button
                         type="button"
                         className="btn-close"
@@ -174,34 +176,57 @@ function MyOrders() {
                     )}
 
                     <div className="row g-3">
-                      {order.items.map((item, idx) => (
-                        <div key={item.id || idx} className="col-md-6">
-                          <div className="card h-100 shadow-sm border-0 bg-light">
-                            <div className="card-body">
-                              <h6 className="card-title fw-bold mb-2">
-                                Ítem #{idx + 1} - {item.shape || 'Pieza'}
-                              </h6>
-                              <ul className="list-unstyled small mb-2 text-muted">
-                                <li><strong>Medidas:</strong> {item.width_mm} mm x {item.length_mm} mm</li>
-                                <li><strong>Espesor:</strong> {item.thickness_mm} mm</li>
-                                {item.folds && <li><strong>Pliegues:</strong> {item.folds}</li>}
-                              </ul>
-                              {item.blueprint && (
-                                <div className="mt-2">
-                                  <a
-                                    href={item.blueprint}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="btn btn-outline-dark btn-sm"
-                                  >
-                                    Ver plano adjunto ↗
-                                  </a>
-                                </div>
-                              )}
+                      {order.items.map((item, idx) => {
+                        const resolvedBlueprint = getMediaUrl(item.blueprint)
+                        const isBroken = brokenImages[item.id || idx]
+
+                        return (
+                          <div key={item.id || idx} className="col-md-6">
+                            <div className="card h-100 shadow-sm border-0 bg-light">
+                              <div className="card-body">
+                                <h6 className="card-title fw-bold mb-2">
+                                  Ítem #{idx + 1} - {item.shape || 'Pieza'}
+                                </h6>
+                                <ul className="list-unstyled small mb-2 text-muted">
+                                  <li><strong>Medidas:</strong> {item.width_mm} mm x {item.length_mm} mm</li>
+                                  <li><strong>Espesor:</strong> {item.thickness_mm} mm</li>
+                                  {item.folds && <li><strong>Pliegues:</strong> {item.folds}</li>}
+                                </ul>
+
+                                {resolvedBlueprint && (
+                                  <div className="mt-3 p-2 border rounded bg-white text-center">
+                                    {!isBroken ? (
+                                      <img
+                                        src={resolvedBlueprint}
+                                        alt="Plano adjunto"
+                                        className="img-fluid rounded mb-2 shadow-sm"
+                                        style={{ maxHeight: '180px', objectFit: 'contain' }}
+                                        onError={() => {
+                                          setBrokenImages((prev) => ({ ...prev, [item.id || idx]: true }))
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="alert alert-secondary py-1 small mb-2">
+                                        Vista previa no disponible
+                                      </div>
+                                    )}
+                                    <div>
+                                      <a
+                                        href={resolvedBlueprint}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="btn btn-outline-dark btn-sm"
+                                      >
+                                        Ver plano en tamaño completo ↗
+                                      </a>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
                 )
