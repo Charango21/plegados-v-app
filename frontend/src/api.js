@@ -1,4 +1,4 @@
-import { API_URL } from './config'
+import { API_URL, getMediaUrl, BACKEND_BASE_URL } from './config'
 
 async function request(path, options = {}) {
   const token = localStorage.getItem('access')
@@ -44,3 +44,5 @@ export function apiPatch(path, data) {
 export function apiDelete(path) {
   return request(path, { method: 'DELETE' })
 }
+
+export { getMediaUrl, BACKEND_BASE_URL }
