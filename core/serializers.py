@@ -63,18 +63,20 @@ class SheetMaterialSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    blueprint = serializers.SerializerMethodField()
-
     class Meta:
         model = OrderItem
         fields = '__all__'
 
-    def get_blueprint(self, obj):
-        if not obj.blueprint:
-            return None
-        url = obj.blueprint.url
-        request = self.context.get('request')
-        return request.build_absolute_uri(url) if request else url
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.blueprint:
+            try:
+                url = instance.blueprint.url
+                request = self.context.get('request')
+                ret['blueprint'] = request.build_absolute_uri(url) if request else url
+            except Exception:
+                pass
+        return ret
 
     def validate(self, data):
         request = self.context.get('request')
