@@ -49,6 +49,13 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('role', 'created_at', 'updated_at')
 
 
+class StaffUserSerializer(UserSerializer):
+    role = serializers.ChoiceField(choices=User.Role.choices)
+
+    class Meta(UserSerializer.Meta):
+        read_only_fields = ('created_at', 'updated_at')
+
+
 class SheetMaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = SheetMaterial
@@ -56,9 +63,18 @@ class SheetMaterialSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    blueprint = serializers.SerializerMethodField()
+
     class Meta:
         model = OrderItem
         fields = '__all__'
+
+    def get_blueprint(self, obj):
+        if not obj.blueprint:
+            return None
+        url = obj.blueprint.url
+        request = self.context.get('request')
+        return request.build_absolute_uri(url) if request else url
 
     def validate(self, data):
         request = self.context.get('request')
@@ -77,12 +93,16 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
         width = data.get('width_mm', 0)
         length = data.get('length_mm', 0)
+        thickness = data.get('thickness_mm')
 
         if width <= 0 or length <= 0:
             raise serializers.ValidationError('El ancho y largo deben ser valores positivos mayores a cero.')
 
         if width > sheet_material.max_width_mm or length > sheet_material.max_length_mm:
             raise serializers.ValidationError('Las medidas superan los límites admitidos para esta chapa.')
+
+        if thickness != sheet_material.thickness_mm:
+            raise serializers.ValidationError('El espesor debe coincidir con el material seleccionado.')
 
         return data
 
@@ -100,15 +120,15 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('id', 'customer', 'employee', 'status', 'notes', 'items', 'created_at', 'updated_at')
-        read_only_fields = ('created_at', 'updated_at')
+        fields = ('id', 'customer_order_number', 'customer', 'employee', 'status', 'notes', 'items', 'created_at', 'updated_at')
+        read_only_fields = ('customer_order_number', 'created_at', 'updated_at')
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ('id', 'customer', 'employee', 'status', 'notes')
-        read_only_fields = ('id', 'customer')
+        fields = ('id', 'customer_order_number', 'customer', 'employee', 'status', 'notes')
+        read_only_fields = ('id', 'customer', 'customer_order_number')
 
     def validate(self, data):
         if self.instance and self.instance.items.count() == 0:

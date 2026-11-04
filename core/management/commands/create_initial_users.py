@@ -12,15 +12,24 @@ class Command(BaseCommand):
         admin_password = os.environ.get('ADMIN_PASSWORD')
         employee_username = os.environ.get('EMPLOYEE_USERNAME')
         employee_password = os.environ.get('EMPLOYEE_PASSWORD')
+        admin_email = os.environ.get('ADMIN_EMAIL')
+        employee_email = os.environ.get('EMPLOYEE_EMAIL')
 
         if not any((admin_username, admin_password, employee_username, employee_password)):
             self.stdout.write('No initial user credentials configured; skipping.')
             return
 
-        if not all((admin_username, admin_password, employee_username, employee_password)):
+        if not all((
+            admin_username,
+            admin_password,
+            admin_email,
+            employee_username,
+            employee_password,
+            employee_email,
+        )):
             raise CommandError(
-                'ADMIN_USERNAME, ADMIN_PASSWORD, EMPLOYEE_USERNAME and '
-                'EMPLOYEE_PASSWORD must be configured together.'
+                'ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL, EMPLOYEE_USERNAME, '
+                'EMPLOYEE_PASSWORD and EMPLOYEE_EMAIL must be configured together.'
             )
 
         User = get_user_model()
@@ -28,7 +37,7 @@ class Command(BaseCommand):
             User,
             username=admin_username,
             password=admin_password,
-            email=os.environ.get('ADMIN_EMAIL', 'admin@plegadosverdini.com'),
+            email=admin_email,
             role=User.Role.JEFE,
             is_staff=True,
             is_superuser=True,
@@ -37,7 +46,7 @@ class Command(BaseCommand):
             User,
             username=employee_username,
             password=employee_password,
-            email=os.environ.get('EMPLOYEE_EMAIL', 'empleado@plegadosverdini.com'),
+            email=employee_email,
             role=User.Role.EMPLEADO,
             is_staff=False,
             is_superuser=False,

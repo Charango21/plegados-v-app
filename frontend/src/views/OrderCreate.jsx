@@ -61,9 +61,7 @@ function OrderCreate() {
     setSelectedMaterialId(materialId)
     const found = materials.find((m) => String(m.id) === String(materialId))
     setSelectedMaterial(found || null)
-    if (found) {
-      setThickness(found.thickness_mm)
-    }
+    if (found) setThickness(found.thickness_mm)
   }
 
   // Previsualización del archivo de dibujo/plano
@@ -85,6 +83,8 @@ function OrderCreate() {
   // Validaciones
   const numWidth = parseFloat(width) || 0
   const numLength = parseFloat(length) || 0
+  const invalidWidth = numWidth <= 0
+  const invalidLength = numLength <= 0
   const exceedsMaxWidth = selectedMaterial && numWidth > parseFloat(selectedMaterial.max_width_mm)
   const exceedsMaxLength = selectedMaterial && numLength > parseFloat(selectedMaterial.max_length_mm)
 
@@ -105,8 +105,8 @@ function OrderCreate() {
       return
     }
 
-    if (exceedsMaxWidth || exceedsMaxLength) {
-      setError('Las medidas superan los límites permitidos para la chapa seleccionada.')
+    if (invalidWidth || invalidLength || exceedsMaxWidth || exceedsMaxLength) {
+      setError('El ancho y el largo deben ser positivos y respetar los límites de la chapa seleccionada.')
       return
     }
 
@@ -136,7 +136,7 @@ function OrderCreate() {
       formData.append('sheet_material', selectedMaterialId)
       formData.append('width_mm', numWidth)
       formData.append('length_mm', numLength)
-      formData.append('thickness_mm', parseFloat(thickness) || selectedMaterial.thickness_mm)
+      formData.append('thickness_mm', selectedMaterial.thickness_mm)
       formData.append('shape', shape.trim())
       formData.append('folds', folds.trim())
       if (blueprintFile) {
@@ -272,6 +272,7 @@ function OrderCreate() {
                             <input
                               type="number"
                               step="0.1"
+                              min="0.1"
                               className={`form-control ${exceedsMaxWidth ? 'is-invalid' : ''}`}
                               id="width"
                               placeholder="Ej: 500"
@@ -292,6 +293,7 @@ function OrderCreate() {
                             <input
                               type="number"
                               step="0.1"
+                              min="0.1"
                               className={`form-control ${exceedsMaxLength ? 'is-invalid' : ''}`}
                               id="length"
                               placeholder="Ej: 1200"
@@ -318,7 +320,7 @@ function OrderCreate() {
                               className="form-control"
                               id="thickness"
                               value={thickness}
-                              onChange={(e) => setThickness(e.target.value)}
+                              readOnly
                               disabled={isSubmitting}
                             />
                           </div>
@@ -370,7 +372,7 @@ function OrderCreate() {
                         <button
                           type="submit"
                           className="sketch-btn-light w-100 py-3"
-                          disabled={isSubmitting || exceedsMaxWidth || exceedsMaxLength}
+                          disabled={isSubmitting || invalidWidth || invalidLength || exceedsMaxWidth || exceedsMaxLength}
                         >
                           {isSubmitting ? (
                             <span>
