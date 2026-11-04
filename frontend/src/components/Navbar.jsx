@@ -12,6 +12,7 @@ function Navbar() {
   }
 
   const isStaff = user && (user.role === 'jefe' || user.role === 'empleado')
+  const isClient = user?.role === 'cliente'
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark navbar-sketch">
@@ -42,18 +43,22 @@ function Navbar() {
                 Inicio
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/hacer-pedido">
-                Hacer pedido
-              </NavLink>
-            </li>
+            {(!user || isClient) && (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/hacer-pedido">
+                  Hacer pedido
+                </NavLink>
+              </li>
+            )}
             {user ? (
               <>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/mis-pedidos">
-                    Mis pedidos
-                  </NavLink>
-                </li>
+                {isClient && (
+                  <li className="nav-item">
+                    <NavLink className="nav-link" to="/mis-pedidos">
+                      Mis pedidos
+                    </NavLink>
+                  </li>
+                )}
                 {isStaff && (
                   <li className="nav-item">
                     <NavLink className="nav-link fw-semibold text-warning" to="/admin-panel">

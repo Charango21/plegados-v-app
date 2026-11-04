@@ -627,7 +627,7 @@ function AdminPanel() {
                 style={{ maxWidth: '750px', width: '100%', maxHeight: '90vh' }}
               >
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h4 className="text-white mb-0">Detalle del Pedido #{selectedOrderDetails.id}</h4>
+                   <h4 className="text-white mb-0">Detalle del Pedido #{selectedOrderDetails.customer_order_number}</h4>
                   <button
                     type="button"
                     className="btn-close btn-close-white"
@@ -652,7 +652,7 @@ function AdminPanel() {
                       <div className="sketch-inner-box">
                         <div className="d-flex justify-content-between align-items-center mb-2">
                           <h6 className="fw-bold mb-0">
-                            Ítem #{idx + 1} - Forma: {item.shape || 'Pieza'}
+                                 Ítem #{item.id} - Forma: {item.shape || 'Pieza'}
                           </h6>
                           <span className="badge bg-dark">
                             {item.width_mm} mm x {item.length_mm} mm (e={item.thickness_mm} mm)

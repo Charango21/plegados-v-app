@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthProvider'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
 import AdminRoute from './components/AdminRoute'
+import ClientRoute from './components/ClientRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import Home from './views/Home'
 import Login from './views/Login'
@@ -47,25 +48,32 @@ function App() {
             <Route path="/materials" element={<Materials />} />
             <Route path="/materials/:id" element={<MaterialDetail />} />
 
-            {/* Explorar confección de pedido (público para configurar medidas) */}
-            <Route path="/hacer-pedido" element={<OrderCreate />} />
+            {/* Creación de pedidos exclusiva para clientes */}
+            <Route
+              path="/hacer-pedido"
+              element={
+                <ClientRoute>
+                  <OrderCreate />
+                </ClientRoute>
+              }
+            />
 
             {/* ================= VISTAS AUTENTICADAS (Paso 5: ProtectedRoute) ================= */}
             {/* Creación de pedido / Checkout formal protegido */}
             <Route
               path="/pedidos/nuevo"
               element={
-                <ProtectedRoute>
+                <ClientRoute>
                   <OrderCreate />
-                </ProtectedRoute>
+                </ClientRoute>
               }
             />
             <Route
               path="/checkout"
               element={
-                <ProtectedRoute>
+                <ClientRoute>
                   <OrderCreate />
-                </ProtectedRoute>
+                </ClientRoute>
               }
             />
 
@@ -73,17 +81,17 @@ function App() {
             <Route
               path="/mis-pedidos"
               element={
-                <ProtectedRoute>
+                <ClientRoute>
                   <MyOrders />
-                </ProtectedRoute>
+                </ClientRoute>
               }
             />
             <Route
               path="/orders"
               element={
-                <ProtectedRoute>
+                <ClientRoute>
                   <Navigate to="/mis-pedidos" replace />
-                </ProtectedRoute>
+                </ClientRoute>
               }
             />
 

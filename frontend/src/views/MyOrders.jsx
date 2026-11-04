@@ -119,7 +119,7 @@ function MyOrders() {
                       const itemsCount = order.items?.length || 0
                       return (
                         <tr key={order.id}>
-                          <td className="fw-bold text-white">#{order.id}</td>
+                         <td className="fw-bold text-white">#{order.customer_order_number}</td>
                           <td>
                             {itemsCount > 0 ? (
                               <span>
@@ -158,7 +158,7 @@ function MyOrders() {
                 return (
                   <div className="mt-4 p-4 sketch-inner-box">
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                      <h5 className="mb-0 fw-bold">Detalle del Pedido #{order.id}</h5>
+                       <h5 className="mb-0 fw-bold">Detalle del Pedido #{order.customer_order_number}</h5>
                       <button
                         type="button"
                         className="btn-close"

@@ -16,6 +16,7 @@ from .serializers import (
     OrderSerializer,
     OrderCreateSerializer,
     OrderItemSerializer,
+    StaffUserSerializer,
 )
 
 
@@ -53,6 +54,11 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAdminOrVendedor]
 
+    def get_serializer_class(self):
+        if self.action in ('update', 'partial_update') and self.request.user.role == 'jefe':
+            return StaffUserSerializer
+        return UserSerializer
+
 
 class SheetMaterialViewSet(viewsets.ModelViewSet):
     queryset = SheetMaterial.objects.all()
@@ -72,7 +78,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         return OrderSerializer
 
     def perform_create(self, serializer):
-        serializer.save(customer=self.request.user)
+        customer = self.request.user
+        serializer.save(
+            customer=customer,
+            customer_order_number=Order.objects.filter(customer=customer).count() + 1,
+        )
 
     def get_queryset(self):
         queryset = super().get_queryset()
